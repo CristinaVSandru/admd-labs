@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'models/user.dart';
+import 'models/bank_account.dart';
+import 'models/Library.dart';
+import 'models/book.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,22 +17,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.green),
+
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
       home: const MyHomePage(title: 'My First Flutter Lab  '),
     );
@@ -54,69 +44,130 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  final user1 = User(name:'Ana', age:22);
+  final user2 = User(name:'Cristina',email:"cristina.sandru@gmail.com");
+  final user3 = User(name:'Peter');
+
+
+  final List<BankAccount> accounts = [
+
+  BankAccount(
+    holderName: 'Ana Popescu',
+    bankBranch: 'Main Branch',
+    balance: 1200.0,
+  )..initializeAccount('1001'),
+
+  BankAccount(
+    holderName: 'Cristina Sandru',
+    balance: 50.0,
+  ),
+
+  BankAccount(
+    holderName: 'Peter Parker',
+    bankBranch: 'Downtown',
+    balance: 300.0,
+  ),
+];
 
   @override
+  void initState() {
+    super.initState();
+    _runLibraryTests();
+  }
+
+  void _runLibraryTests() {
+  
+    print(' TEST LIBRARY ');
+
+    final library = Library();
+    final book1 = Book(title: 'Book1', author: 'Eric Windmill', publishDate: DateTime(2020, 1, 1));
+    final book2 = Book(title: 'Book2', author: 'Robert  Martin', publishDate: DateTime(2008, 8, 1));
+    final book3 = Book(title: 'Book3', author: 'Jonathan Sande', publishDate: DateTime(2021, 5, 1));
+    final book4 = Book(title: 'Book4', author: 'John Doe', publishDate: DateTime(2023, 2, 10));
+    library.addItem(book1);
+    library.addItem(book2);
+    library.addItem(book3);
+    library.addItem(book4);
+
+
+    print('1. Books added: ${library.items.length} items in the library.');
+
+    final foundBooks = library.searchByTitle('Book1');
+    final nullSearch = library.searchByTitle(null);
+    print('Searching for ${foundBooks}: ${foundBooks.length} rezultate.');
+    print(' Null search test${nullSearch.isEmpty}');
+
+
+final recent = library.getRecentItems();
+    print('Newest book added: ${recent.first.title} (${recent.first.publishDate?.year})');
+   
+   print('Borrowed:');
+    library.borrowItem(book1, user1);
+    library.borrowItem(book2, user2);
+    print('${user1.name} Borrowed: ${book1.title}');
+    print('${user2.name} Borowed: ${book2.title}');
+
+  
+  print('Return test:');
+  bool isReturned = library.returnItem(book1);
+  print('${book1.title } was returned. Is returned: ${isReturned} ');
+
+  }
+  @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+  
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Colors.amber,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
+        backgroundColor: const Color.fromARGB(255, 204, 139, 177),
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+    
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
+        
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          
+            const SizedBox(height: 16),   
+            Text('User 1 INFO:'),
+            Text('Name: ${user1.name}'),
+            Text('Age: ${user1.getDisplayAge()}'),
+            Text('Email: ${user1.describeEmail()}'),
+            const SizedBox(height: 16),
+            Text('User 2 INFO'),
+            Text('Name: ${user2.name}'),
+            Text('Age: ${user2.getDisplayAge()}'),
+            Text('Email: ${user2.describeEmail()}'),
+            const SizedBox(height: 16),
+            Text('User 3 INFO'),
+            Text('Name: ${user3.name}'),
+            Text('Age: ${user3.getDisplayAge()}'),
+            Text('Email: ${user3.describeEmail()}'),
+            
+            Expanded(
+            child: ListView.builder(
+              itemCount: accounts.length,
+              itemBuilder: (context, i) {
+                final a = accounts[i];
+                return ListTile(
+                 title: Text(a.holderName),
+                 subtitle: Column (
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                 children: [
+                 Text('Branch: ${a.bankBranch ?? "N/A"}'),
+                 Text(a.checkNumber() ? 'Account nr: ${a.accountNumber}': 'Account nr: Not initialized',),
+                Text('Balance: \$${a.balance}'),
+              ],
+             ),
+             );
+            },
             ),
+          ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
+      );
+      
   }
 }
